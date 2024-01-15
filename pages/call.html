@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Video Call</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://media.twiliocdn.com/sdk/js/video/v1/twilio-video.min.js"></script>
+</head>
+
+<body>
+    <h1>Video Call</h1>
+
+    <div>
+        <button onclick="joinRoom()">Join Room</button>
+    </div>
+
+    <div id="roomNameContainer"></div>
+    <div id="videoContainer"></div>
+
+    <script>
+        const socket = io();
+        const roomNameContainer = document.getElementById('roomNameContainer');
+        const videoContainer = document.getElementById('videoContainer');
+
+        function joinRoom() {
+            // Gửi yêu cầu tạo phòng video từ máy chủ
+            fetch('/room')
+                .then(response => response.json())
+                .then(data => {
+                    const roomName = data.roomName;
+                    roomNameContainer.innerText = `Room Name: ${roomName}`;
+
+                    // Kết nối tới phòng video
+                    socket.emit('join-room', roomName);
+
+                    // Tạo token cho người dùng
+                    fetch('/token', { method: 'POST' })
+                        .then(response => response.json())
+                        .then(data => {
+                            const token = data.token;
+
+                            // Kết nối tới phòng video
+                            connectToRoom(token);
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
+
+        function connectToRoom(token) {
+            // Kết nối tới phòng video
+            Twilio.Video.connect(token, { roomName: roomNameContainer.innerText })
+                .then(room => {
+                    console.log(`Connected to room ${room.name}`);
+
+                    // Hiển thị video từ các thành viên trong phòng
+                    room.on('participantConnected', participant => {
+                        console.log(`Participant ${participant.identity} connected`);
+
+                        participant.tracks.forEach(track => {
+                            if (track.kind === 'video') {
+                                const videoElement = document.createElement('video');
+                                videoElement.autoplay = true;
+                                videoElement.srcObject = track.mediaStreamTrack;
+                                videoContainer.appendChild(videoElement);
+                            }
+                        });
+                    });
+
+                    // Xử lý sự kiện ngắt kết nối của thành viên trong phòng
+                    room.on('participantDisconnected', participant => {
+                        console.log(`Participant ${participant.identity} disconnected`);
+
+                        // Xóa video của thành viên đã ngắt kết nối
+                        Array.from(videoContainer.childNodes).forEach(node => {
+                            if (node.tagName === 'VIDEO' && node.srcObject.id === participant.sid) {
+                                node.remove();
+                            }
+                        });
+                    });
+
+                    // Xử lý sự kiện nhận offer từ thành viên khác trong phòng
+                    socket.on('offer', offer => {
+                        console.log('Received offer');
+
+                        // Tạo peer connection và set remote description
+                        const pc = new RTCPeerConnection();
+                        pc.setRemoteDescription(new RTCSessionDescription(offer));
+
+                        // Tạo answer và gửi lại cho thành viên gọi
+                        pc.createAnswer()
+                            .then(answer => {
+                                pc.setLocalDescription(answer);
+                                socket.emit('answer', { roomName: roomNameContainer.innerText, answer: answer });
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+
+                        // Xử lý sự kiện nhận ice candidate từ thành viên khác trong phòng
+                        socket.on('ice-candidate', candidate => {
+                            console.log('Received ice candidate');
+
+                            // Thêm ice candidate vào peer connection
+                            pc.addIceCandidate(new RTCIceCandidate(candidate))
+                                .catch(error => {
+                                    console.log(error);
+                                });
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
+    </script>
+</body>
+
+</html>

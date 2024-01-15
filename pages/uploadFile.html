@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>File Transfer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2>File Transfer</h2>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-6">
+                <input type="file" id="file-input" class="form-control">
+            </div>
+            <div class="col-6">
+                <button id="upload-button" class="btn btn-primary">Upload</button>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <h4>Download Links:</h4>
+                <ul id="download-links"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const fileInput = document.getElementById('file-input');
+        const uploadButton = document.getElementById('upload-button');
+        const downloadLinksContainer = document.getElementById('download-links');
+
+        uploadButton.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                return alert('Please select a file.');
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            socket.emit('upload', { file: formData });
+        });
+
+        socket.on('download', (data) => {
+            const fileName = data.fileName;
+
+            // Tạo một liên kết tải về file
+            const downloadLink = document.createElement('a');
+            downloadLink.href = '/download/' + fileName;
+            downloadLink.download = fileName;
+            downloadLink.innerHTML = 'Download ' + fileName;
+
+            // Thêm liên kết vào tài liệu HTML
+            const listItem = document.createElement('li');
+            listItem.appendChild(downloadLink);
+            downloadLinksContainer.appendChild(listItem);
+        });
+    </script>
+</body>
+
+</html>

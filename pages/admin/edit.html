@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Create User</h1>
+
+        <!-- Form for creating a new user -->
+        <form id="createUserForm" method="POST">
+            <div class="mb-3">
+                <label for="usernameInput" class="form-label">Username</label>
+                <input type="text" class="form-control" id="usernameInput" name="Username" required>
+            </div>
+            <div class="mb-3">
+                <label for="emailInput" class="form-label">Email</label>
+                <input type="email" class="form-control" id="emailInput" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="passwordInput" class="form-label">Password</label>
+                <input type="password" class="form-control" id="passwordInput" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create User</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        // Function to create a new user
+        $('#createUserForm').submit(function (event) {
+            event.preventDefault();
+
+            var form = $(this);
+            var url = form.attr('action');
+            var formData = form.serialize();
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function () {
+                    window.location.href = '/users';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Quản lý người dùng</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Quản lý người dùng</h1>
+
+        <h2>Danh sách người dùng</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+
+        <h2>Thêm người dùng</h2>
+        <form id="addUserForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Thêm người dùng</button>
+        </form>
+    </div>
+
+    <script>
+        // Lấy danh sách người dùng và hiển thị trên bảng
+        function getUsers() {
+            fetch('/users')
+                .then(response => response.json())
+                .then(data => {
+                    const userTable = document.getElementById('userTable');
+                    userTable.innerHTML = '';
+
+                    data.forEach(user => {
+                        const row = `<tr>
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td>${user.password}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="editUser('${user._id}')">Sửa</button>
+                                <button class="btn btn-danger" onclick="deleteUser('${user._id}')">Xóa</button>
+                            </td>
+                        </tr>`;
+                        userTable.innerHTML += row;
+                    });
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy danh sách người dùng:', error);
+                });
+        }
+
+        // Thêm người dùng mới
+        function addUser(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('addUserForm');
+            const username = form.username.value;
+            const email = form.email.value;
+            const password = form.password.value;
+
+            const newUser = {
+                username: username,
+                email: email,
+                password: password
+            };
+
+            fetch('/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newUser)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Người dùng đã được thêm:', data);
+                    form.reset();
+                    getUsers();
+                })
+                .catch(error => {
+                    console.error('Lỗi khi thêm người dùng:', error);
+                });
+        }
+
+        // Sửa người dùng
+        function editUser(userId) {
+            // Thực hiện logic sửa người dùng
+            console.log('Sửa người dùng với ID:', userId);
+        }
+
+        // Xóa người dùng
+        function deleteUser(userId) {
+            if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
+                fetch(`/users/${userId}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Người dùng đã được xóa:', data);
+                        getUsers();
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi xóa người dùng:', error);
+                    });
+            }
+        }
+
+        // Gọi hàm getUsers khi trang được tải
+        document.addEventListener('DOMContentLoaded', () => {
+            getUsers();
+        });
+
+        // Gắn sự kiện submit form để thêm người dùng
+        const addUserForm = document.getElementById('addUserForm');
+        addUserForm.addEventListener('submit', addUser);
+    </script>
+</body>
+
+</html>

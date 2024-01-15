@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat app</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("https://png.pngtree.com/thumb_back/fw800/background/20190222/ourmid/pngtree-warm-colored-little-stars-background-colorcolorlittle-starswatercolorpurplepinkyellowsolar-termsfestivalbackground-image_51221.jpg");
+        }
+
+        .chat__section {
+            max-width: 400px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .brand {
+            background-color: #007bff;
+            padding: 10px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .brand h1 {
+            font-size: 20px;
+        }
+
+        .message__area {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            animation: slide-in 0.5s ease-out;
+        }
+
+        .message__area p {
+            margin-bottom: 10px;
+        }
+
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-top: 1px solid #ccc;
+            resize: none;
+            outline: none;
+            animation: fade-in 0.5s ease-out;
+        }
+
+        #textarea:focus {
+            border-color: #007bff;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="chat__section">
+        <div class="brand">
+            <h1>ChatQKA</h1>
+        </div>
+        <div class="message__area"></div>
+        <div>
+            <textarea id="textarea" cols="30" rows="1" placeholder="Nhập ..."></textarea>
+        </div>
+    </section>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/client.js"></script>
+</body>
+
+</html>

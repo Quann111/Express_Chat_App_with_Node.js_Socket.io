@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Danh sách người dùng</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css"
+        integrity="sha384-4fz7Py8x8l5n6u3iPq5A2Zn3/fJEcB9Rl3wh1fW1yKZ1X3/De4g6R4Y3hCzGzD9i" crossorigin="anonymous">
+    <style>
+        .custom-container {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-content {
+            background-color: #ffffff;
+            padding: 20px;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-content h1 {
+            margin-top: 0;
+        }
+
+        .table {
+            margin-top: 20px;
+        }
+
+        .btn-danger {
+            color: #ffffff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            color: #ffffff;
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+        }
+
+        .btn-primary {
+            color: #ffffff;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            color: #ffffff;
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="custom-container">
+        <div class="custom-content">
+            <div class="container">
+                <h1 class="mt-4">Danh sách người dùng</h1>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Tên người dùng</th>
+                            <th scope="col">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(function(user) { %>
+                            <tr>
+                                <th scope="row">
+                                    <%= user._id %>
+                                </th>
+                                <td><a href="/users/<%= user._id %>">
+                                        <%= user.Username %>
+                                    </a></td>
+                                <td>
+                                    <button onclick="deleteUser('<%= user._id %>')"
+                                        class="btn btn-danger btn-sm">Xóa</button>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            </div>
+
+            <form class="mt-4">
+                <!-- Thêm các trường và nút gửi của form tại đây -->
+            </form>
+        </div>
+    </div>
+
+    <!-- Bao gồm các tệp tài nguyên cần thiết -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha384-Ky5+UJqR9D5mP7jUY5yK7vzc3x2YB4y4N/3Uv0W3jJ1e4tjiq4bYfKJw3hLmM2b+"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"
+        integrity="sha384-/o4y1y3vq4wG2j/2fd63g0j1lUl0VQyv7o4iLzKj4uAS2qN9C0UeXq8i9hjLQZzS"
+        crossorigin="anonymous"></script>
+
+    <script>
+        function deleteUser(userId) {
+            if (confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+                fetch(`/users/${userId}`, { method: 'DELETE' })
+                    .then(() => {
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Lỗi khi xóa người dùng', error);
+                    });
+            }
+        }
+    </script>
+</body>
+
+</html>
